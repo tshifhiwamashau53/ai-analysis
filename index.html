@@ -1,2 +1,74 @@
 <!doctype html>
-<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>ChartLens — Local Chart Analyzer</title><link rel="stylesheet" href="style.css"><script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script></head><body><header class="topbar"><div class="brand"><span class="brand-mark">CL</span><div><strong>ChartLens</strong><small>Local Screenshot Analyzer</small></div></div><div class="status"><span class="dot"></span> NO API</div></header><main class="shell"><section class="hero"><div><p class="eyebrow">SCREENSHOT → PIXELS → PRICE MAP</p><h1>Upload a chart.<br><span>Read the map locally.</span></h1><p class="sub">Everything runs in your browser. No OpenAI key, backend API or server is required.</p></div><div class="hero-note"><b>How it works</b><br>The browser scans the screenshot, detects chart colors and the visible price axis, then maps pixel positions to candidate levels. If the price scale cannot be calibrated, it will say so instead of inventing prices.</div></section><section class="workspace"><div class="upload-card" id="dropZone"><input id="fileInput" type="file" accept="image/png,image/jpeg,image/webp" hidden><div class="upload-icon">↑</div><h2>Drop your chart screenshot here</h2><p>PNG, JPG or WebP · up to 12 MB</p><button class="primary" id="chooseBtn">Choose screenshot</button><button class="ghost hidden" id="analyzeBtn">Analyze locally</button><div class="preview-wrap hidden" id="previewWrap"><img id="preview" alt="Chart preview"></div><div class="file-name" id="fileName"></div></div><aside class="settings"><h3>Analysis settings</h3><label>Market <input id="market" placeholder="Auto-detect"></label><label>Timeframe <select id="timeframe"><option>Auto-detect</option><option>1m</option><option>5m</option><option>15m</option><option>30m</option><option>1H</option><option>4H</option><option>1D</option></select></label><label>Chart style <select id="style"><option>Price action + liquidity</option><option>Market structure</option><option>Conservative levels</option></select></label><div class="checks"><div>✓ Browser-only processing</div><div>✓ Candle/color detection</div><div>✓ Price-axis OCR</div><div>✓ Candidate entry / SL / TP</div></div></aside></section><section class="results hidden" id="results"><div class="result-head"><div><p class="eyebrow">LOCAL ANALYSIS</p><h2 id="resultTitle">Chart analysis</h2></div><span class="badge" id="biasBadge">WAIT</span></div><div class="metrics" id="metrics"></div><div class="levels-grid"><div class="panel"><h3>Current price</h3><div class="big-value" id="current">—</div><p id="currentReason">—</p></div><div class="panel"><h3>Candidate entry</h3><div class="big-value" id="entry">—</div><p id="entryReason">—</p></div><div class="panel"><h3>Stop loss</h3><div class="big-value" id="sl">—</div><p id="slReason">—</p></div><div class="panel"><h3>Take profit</h3><div class="big-value" id="tp">—</div><p id="tpReason">—</p></div></div><div class="two-col"><div class="panel"><h3>Buy stops</h3><div id="buyStops" class="level-list"></div></div><div class="panel"><h3>Sell stops</h3><div id="sellStops" class="level-list"></div></div></div><div class="panel"><h3>Detection report</h3><div id="report" class="structure"></div></div><div class="panel explanation"><h3>Important</h3><p id="explanation">—</p></div><div class="warning">Educational chart geometry only. This local analyzer does not know future market direction and does not guarantee a trade outcome.</div></section><div class="loading hidden" id="loading"><div class="spinner"></div><span id="loadingText">Reading screenshot locally…</span></div><div class="error hidden" id="error"></div></main><script src="app.js"></script></body></html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0b0f14">
+<title>ChartLens — Local Chart Analyzer</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<main class="wrap">
+  <header class="hero">
+    <h1>ChartLens</h1>
+    <p>Local screenshot chart analyzer</p>
+    <span class="status">NO API</span>
+  </header>
+
+  <section class="card">
+    <div id="dropZone" class="drop-zone">
+      <input id="fileInput" type="file" accept="image/png,image/jpeg,image/webp" hidden>
+      <button id="chooseBtn" type="button">Upload chart screenshot</button>
+      <p>PNG, JPG or WebP · up to 12 MB</p>
+      <p id="fileName"></p>
+    </div>
+
+    <div id="previewWrap" class="hidden">
+      <img id="preview" alt="Uploaded chart screenshot">
+    </div>
+
+    <div class="controls">
+      <label>Market
+        <select id="market"><option>XAUUSD</option><option>BTCUSD</option><option>US30</option><option>EURUSD</option></select>
+      </label>
+      <label>Timeframe
+        <select id="timeframe"><option>5M</option><option>15M</option><option>1H</option><option>4H</option><option>1D</option></select>
+      </label>
+    </div>
+
+    <button id="analyzeBtn" class="hidden" type="button">Analyze locally</button>
+    <div id="loading" class="hidden"><span id="loadingText">Analyzing…</span></div>
+    <div id="error" class="hidden" role="alert"></div>
+  </section>
+
+  <section id="results" class="card hidden">
+    <div class="result-head"><h2 id="resultTitle"></h2><span id="biasBadge"></span></div>
+    <div id="metrics"></div>
+    <div class="level"><span>Current price</span><strong id="current">—</strong><small id="currentReason"></small></div>
+    <div class="level"><span>Candidate entry</span><strong id="entry">—</strong><small id="entryReason"></small></div>
+    <div class="level"><span>Candidate SL</span><strong id="sl">—</strong><small id="slReason"></small></div>
+    <div class="level"><span>Candidate TP</span><strong id="tp">—</strong><small id="tpReason"></small></div>
+    <h3>Candidate levels</h3>
+    <div id="buyStops"></div><div id="sellStops"></div>
+    <h3>Detection report</h3>
+    <div id="report"></div>
+    <p id="explanation"></p>
+    <p class="warning">Educational chart analysis only. Screenshot readings can be wrong if the price axis or marker is unclear.</p>
+  </section>
+</main>
+<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js" crossorigin="anonymous"></script>
+<script src="app.js"></script>
+<script>
+// Mobile-safe file picker: use a real user gesture and never depend on drag/drop.
+(() => {
+  const input = document.getElementById('fileInput');
+  const button = document.getElementById('chooseBtn');
+  if (!input || !button) return;
+  button.addEventListener('click', (event) => {
+    event.preventDefault();
+    try { input.click(); } catch (e) { input.showPicker?.(); }
+  }, { passive: false });
+})();
+</script>
+</body>
+</html>
