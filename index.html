@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ChartLens AI — Screenshot Market Analyzer</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand"><span class="brand-mark">CL</span><div><strong>ChartLens AI</strong><small>Screenshot Market Analyzer</small></div></div>
+    <div class="status"><span class="dot"></span> AI READY</div>
+  </header>
+
+  <main class="shell">
+    <section class="hero">
+      <div>
+        <p class="eyebrow">SCREENSHOT → STRUCTURE → LEVELS</p>
+        <h1>Upload a chart.<br><span>Get the map.</span></h1>
+        <p class="sub">Upload a clean TradingView or MT5 screenshot. The analyzer reads the visible price scale, current-price marker, market structure and liquidity zones before producing candidate levels.</p>
+      </div>
+      <div class="hero-note"><b>Important</b><br>Analysis is educational and can be wrong. Always verify levels against the live chart before making any financial decision.</div>
+    </section>
+
+    <section class="workspace">
+      <div class="upload-card" id="dropZone">
+        <input id="fileInput" type="file" accept="image/png,image/jpeg,image/webp" hidden />
+        <div class="upload-icon">↑</div>
+        <h2>Drop your chart screenshot here</h2>
+        <p>PNG, JPG or WebP · up to 12 MB</p>
+        <button class="primary" id="chooseBtn">Choose screenshot</button>
+        <button class="ghost hidden" id="analyzeBtn">Analyze chart</button>
+        <div class="preview-wrap hidden" id="previewWrap"><img id="preview" alt="Chart preview" /></div>
+        <div class="file-name" id="fileName"></div>
+      </div>
+
+      <aside class="settings">
+        <h3>Analysis settings</h3>
+        <label>Market <input id="market" placeholder="Auto-detect" /></label>
+        <label>Timeframe <select id="timeframe"><option>Auto-detect</option><option>1m</option><option>5m</option><option>15m</option><option>30m</option><option>1H</option><option>4H</option><option>1D</option></select></label>
+        <label>Style <select id="style"><option>Price action + liquidity</option><option>Market structure</option><option>Conservative levels</option></select></label>
+        <div class="checks"><div>✓ Price-scale calibration</div><div>✓ Current-price detection</div><div>✓ Buy-side / sell-side liquidity</div><div>✓ Entry, SL and TP candidates</div></div>
+      </aside>
+    </section>
+
+    <section class="results hidden" id="results">
+      <div class="result-head"><div><p class="eyebrow">ANALYSIS OUTPUT</p><h2 id="resultTitle">Chart analysis</h2></div><span class="badge" id="biasBadge">WAIT</span></div>
+      <div class="metrics" id="metrics"></div>
+      <div class="levels-grid">
+        <div class="panel"><h3>Candidate entry</h3><div class="big-value" id="entry">—</div><p id="entryReason">—</p></div>
+        <div class="panel"><h3>Stop loss</h3><div class="big-value" id="sl">—</div><p id="slReason">—</p></div>
+        <div class="panel"><h3>Take profit 1</h3><div class="big-value" id="tp1">—</div><p id="tp1Reason">—</p></div>
+        <div class="panel"><h3>Take profit 2</h3><div class="big-value" id="tp2">—</div><p id="tp2Reason">—</p></div>
+      </div>
+      <div class="two-col">
+        <div class="panel"><h3>Liquidity map</h3><div id="liquidity" class="level-list"></div></div>
+        <div class="panel"><h3>Market structure</h3><div id="structure" class="structure"></div></div>
+      </div>
+      <div class="panel explanation"><h3>Why these levels?</h3><p id="explanation">—</p></div>
+      <div class="warning">This tool does not guarantee market direction or profit. Levels are candidates inferred from the supplied screenshot and should be independently verified.</div>
+    </section>
+
+    <div class="loading hidden" id="loading"><div class="spinner"></div><span>Reading chart geometry and price scale…</span></div>
+    <div class="error hidden" id="error"></div>
+  </main>
+  <script src="app.js"></script>
+</body>
+</html>
